@@ -1,0 +1,13 @@
+server:
+  port: 8885
+
+spring:
+  application:
+    name: time-tracker
+  datasource:
+    url: jdbc:postgresql://localhost:24242/timebase
+    username: user
+    password: password
+  jpa:
+    hibernate:
+      ddl-auto: update
