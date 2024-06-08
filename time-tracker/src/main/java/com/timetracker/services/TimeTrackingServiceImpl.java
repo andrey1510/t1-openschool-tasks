@@ -1,7 +1,7 @@
 package com.timetracker.services;
 
 import com.timetracker.dto.MethodDurationStatistics;
-import com.timetracker.models.MethodExecutionRecord;
+import com.timetracker.models.MethodExecutionEntry;
 import com.timetracker.repositories.TimeTrackingRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,13 +17,13 @@ public class TimeTrackingServiceImpl implements TimeTrackingService {
 
     @Override
     @Transactional
-    public MethodExecutionRecord createOperationRecord(MethodExecutionRecord methodExecutionRecord) {
-        return timeTrackingRepository.save(methodExecutionRecord);
+    public MethodExecutionEntry createExecutionEntry(MethodExecutionEntry methodExecutionEntry) {
+        return timeTrackingRepository.save(methodExecutionEntry);
     }
 
     @Override
     @Transactional
-    public List<MethodExecutionRecord> getAllCalls() {
+    public List<MethodExecutionEntry> getAllCalls() {
         return timeTrackingRepository.findAll();
     }
 
@@ -43,5 +43,11 @@ public class TimeTrackingServiceImpl implements TimeTrackingService {
     @Transactional
     public List<MethodDurationStatistics> getDurationStatisticsFilterByPackage(String packageName){
         return timeTrackingRepository.getDurationStatisticsFilterByPackage(packageName);
+    }
+
+    @Override
+    @Transactional
+    public void deleteAll(){
+        timeTrackingRepository.deleteAll();
     }
 }

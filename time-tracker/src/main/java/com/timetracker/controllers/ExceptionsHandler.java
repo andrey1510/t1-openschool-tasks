@@ -1,6 +1,7 @@
 package com.timetracker.controllers;
 
-import com.timetracker.exceptions.NoMethodsFoundException;
+import com.timetracker.exceptions.IntentionallyCausedException;
+import com.timetracker.exceptions.DatabaseIsEmptyException;
 import com.timetracker.exceptions.WrongNumberException;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -23,10 +24,17 @@ public class ExceptionsHandler {
         return new ErrorResponse(ex.getMessage());
     }
 
-    @ExceptionHandler(NoMethodsFoundException.class)
+    @ExceptionHandler(DatabaseIsEmptyException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ResponseBody
-    public ErrorResponse handleNoMethodFoundException(NoMethodsFoundException ex) {
+    public ErrorResponse handleDatabaseIsEmptyException(DatabaseIsEmptyException ex) {
+        return new ErrorResponse(ex.getMessage());
+    }
+
+    @ExceptionHandler(IntentionallyCausedException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseBody
+    public ErrorResponse handleIntentionallyCausedException(IntentionallyCausedException ex) {
         return new ErrorResponse(ex.getMessage());
     }
 

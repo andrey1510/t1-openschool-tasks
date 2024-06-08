@@ -1,8 +1,8 @@
 package com.timetracker.aspects;
 
 import com.timetracker.exceptions.TimeTrackingAspectException;
-import com.timetracker.models.MethodExecutionRecord;
 import com.timetracker.repositories.TimeTrackingRepository;
+import com.timetracker.utils.MethodExecutionEntryCreator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -11,10 +11,8 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
-import java.util.stream.Collectors;
-import java.time.Duration;
+
 import java.time.LocalDateTime;
-import java.util.Arrays;
 
 @Slf4j
 @Component
@@ -31,24 +29,9 @@ public class TrackTimeAspect {
     @Around("trackTimePointcut()")
     public Object logMethodExecution(ProceedingJoinPoint joinPoint) {
 
-        MethodExecutionRecord methodExecutionRecord = new MethodExecutionRecord();
-
         MethodSignature fullSignature = (MethodSignature) joinPoint.getSignature();
-        String methodName = fullSignature.getMethod().getName();
-        String methodParameters = Arrays.stream(fullSignature.getMethod().getParameters())
-            .map(parameter -> parameter.getType().getSimpleName() + " " + parameter.getName())
-            .collect(Collectors.joining(", "));
-        String methodSignature = String.format("%s(%s)", methodName, methodParameters);
-
-        methodExecutionRecord.setMethodSignature(methodSignature);
-        methodExecutionRecord.setClassName(joinPoint.getTarget().getClass().getSimpleName());
-        methodExecutionRecord.setPackageName(joinPoint.getTarget().getClass().getPackageName());
-
         LocalDateTime startTime = LocalDateTime.now();
-
-        methodExecutionRecord.setStartTime(startTime);
-
-        log.info("Method {} started at {}.", methodSignature, startTime);
+        log.info("Method {} started at {}.", fullSignature, startTime);
 
         try {
             return joinPoint.proceed();
@@ -57,10 +40,9 @@ public class TrackTimeAspect {
             throw new TimeTrackingAspectException("Method encountered an exception.", throwable);
         } finally {
             LocalDateTime endTime = LocalDateTime.now();
-            methodExecutionRecord.setEndTime(endTime);
-            log.info("Method {} finished at {}.", methodSignature, endTime);
-            methodExecutionRecord.setDuration(Duration.between(startTime, endTime).toMillis());
-            timeTrackingRepository.save(methodExecutionRecord);
+            log.info("Method {} finished at {}.", fullSignature, endTime);
+            timeTrackingRepository.save(
+                MethodExecutionEntryCreator.createEntity(joinPoint, fullSignature, startTime, endTime));
         }
     }
 

@@ -9,6 +9,7 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -17,12 +18,14 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@AllArgsConstructor
 @RequiredArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
-@Table(name = "execution_record")
-public class MethodExecutionRecord {
+@Builder
+@Schema(description = "Таблица с операциями методов (каждая строка - отдельный вызов метода).")
+@Table(name = "method_execution_entry")
+public class MethodExecutionEntry {
 
     @Id
     @GeneratedValue

@@ -1,7 +1,8 @@
 package com.timetracker.aspects;
 
-import com.timetracker.models.MethodExecutionRecord;
+import com.timetracker.exceptions.TimeTrackingAspectException;
 import com.timetracker.repositories.TimeTrackingRepository;
+import com.timetracker.utils.MethodExecutionEntryCreator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -11,11 +12,8 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -30,36 +28,28 @@ public class TrackAsyncTimeAspect {
     }
 
     @Around("trackAsyncTimePointcut()")
-    public Object logAsyncMethodExecution(ProceedingJoinPoint joinPoint) throws Throwable {
-        MethodExecutionRecord methodExecutionRecord = new MethodExecutionRecord();
-        MethodSignature fullSignature = (MethodSignature) joinPoint.getSignature();
-        String methodName = fullSignature.getMethod().getName();
-        String methodParameters = Arrays.stream(fullSignature.getMethod().getParameters())
-            .map(parameter -> parameter.getType().getSimpleName() + " " + parameter.getName())
-            .collect(Collectors.joining(", "));
-        String methodSignature = String.format("%s(%s)", methodName, methodParameters);
+    public Object logMethodExecution(ProceedingJoinPoint joinPoint) {
+        CompletableFuture<Object> completableFuture = CompletableFuture.supplyAsync(() -> {
+            Object result;
+            MethodSignature fullSignature = (MethodSignature) joinPoint.getSignature();
+            LocalDateTime startTime = LocalDateTime.now();
+            log.info("Method {} started at {}.", fullSignature, startTime);
 
-        methodExecutionRecord.setMethodSignature(methodSignature);
-        methodExecutionRecord.setClassName(joinPoint.getTarget().getClass().getSimpleName());
-        methodExecutionRecord.setPackageName(joinPoint.getTarget().getClass().getPackageName());
-
-        LocalDateTime startTime = LocalDateTime.now();
-        log.info("Method {} started at {}.", methodSignature, startTime);
-        methodExecutionRecord.setStartTime(startTime);
-
-        return CompletableFuture.runAsync(() -> {
             try {
-                joinPoint.proceed();
+                result = joinPoint.proceed();
+            } catch (Throwable throwable) {
+                log.error("Method - {} encountered an exception: {}", joinPoint.getSignature().getName(), throwable.getMessage());
+                throw new TimeTrackingAspectException("Method encountered an exception.", throwable);
+            } finally {
                 LocalDateTime endTime = LocalDateTime.now();
-                methodExecutionRecord.setEndTime(endTime);
-                methodExecutionRecord.setDuration(Duration.between(startTime, endTime).toMillis());
-                timeTrackingRepository.save(methodExecutionRecord);
-                log.info("Method {} finished at {}.", methodSignature, endTime);
-            } catch (Throwable e) {
-                log.error("Method {} - encountered an exception", joinPoint.getSignature().getName());
+                log.info("Method {} finished at {}.", fullSignature, endTime);
+                timeTrackingRepository.save(
+                    MethodExecutionEntryCreator.createEntity(joinPoint, fullSignature, startTime, endTime));
             }
+            return result;
         });
-
+        return completableFuture.join();
     }
 
 }
+

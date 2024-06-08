@@ -1,5 +1,18 @@
 services:
 
+  app:
+    container_name: time-tracker
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - MAVEN_SKIP_TESTS=true
+    ports:
+      - 8885:8080
+    depends_on:
+      - db
+    restart: unless-stopped
+
   db:
     container_name: timedb
     image: postgres:15

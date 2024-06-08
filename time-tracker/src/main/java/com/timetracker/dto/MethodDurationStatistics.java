@@ -2,14 +2,16 @@ package com.timetracker.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
-@AllArgsConstructor
 @RequiredArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
+@Schema(description = "Запись со статистикой по всех вызовах метода.")
 public class MethodDurationStatistics {
 
     @Schema(description = "Сигнатура метода.")

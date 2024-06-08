@@ -1,7 +1,7 @@
 package com.timetracker.repositories;
 
 import com.timetracker.dto.MethodDurationStatistics;
-import com.timetracker.models.MethodExecutionRecord;
+import com.timetracker.models.MethodExecutionEntry;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Repository
-public interface TimeTrackingRepository extends JpaRepository<MethodExecutionRecord, UUID> {
+public interface TimeTrackingRepository extends JpaRepository<MethodExecutionEntry, UUID> {
 
     @Query("SELECT new com.timetracker.dto.MethodDurationStatistics(" +
         "m.methodSignature, " +
@@ -23,7 +23,7 @@ public interface TimeTrackingRepository extends JpaRepository<MethodExecutionRec
         "MAX(m.duration), " +
         "ROUND(STDDEV(m.duration)), " +
         "COUNT(m)) " +
-        "FROM MethodExecutionRecord m " +
+        "FROM MethodExecutionEntry m " +
         "GROUP BY m.methodSignature, m.className, m.packageName")
     List<MethodDurationStatistics> getDurationStatistics();
 
@@ -37,7 +37,7 @@ public interface TimeTrackingRepository extends JpaRepository<MethodExecutionRec
         "MAX(m.duration), " +
         "ROUND(STDDEV(m.duration)), " +
         "COUNT(m)) " +
-        "FROM MethodExecutionRecord m " +
+        "FROM MethodExecutionEntry m " +
         "WHERE m.className = :methodClass " +
         "GROUP BY m.methodSignature, m.className, m.packageName")
     List<MethodDurationStatistics> getDurationStatisticsFilterByClass(@Param("methodClass") String methodClass);
@@ -52,8 +52,8 @@ public interface TimeTrackingRepository extends JpaRepository<MethodExecutionRec
         "MAX(m.duration), " +
         "ROUND(STDDEV(m.duration)), " +
         "COUNT(m)) " +
-        "FROM MethodExecutionRecord m " +
-        "WHERE m.className = :methodPackage " +
+        "FROM MethodExecutionEntry m " +
+        "WHERE m.packageName = :methodPackage " +
         "GROUP BY m.methodSignature, m.className, m.packageName")
     List<MethodDurationStatistics> getDurationStatisticsFilterByPackage(@Param("methodPackage") String methodPackage);
 }
