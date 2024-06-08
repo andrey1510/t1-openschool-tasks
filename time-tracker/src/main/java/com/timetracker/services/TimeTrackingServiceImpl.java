@@ -23,7 +23,7 @@ public class TimeTrackingServiceImpl implements TimeTrackingService {
 
     @Override
     @Transactional
-    public List<MethodExecutionEntry> getAllCalls() {
+    public List<MethodExecutionEntry> getAllEntries() {
         return timeTrackingRepository.findAll();
     }
 

@@ -3,9 +3,9 @@ package com.timetracker.services.sampleTwo;
 
 public interface SampleServiceTwo {
 
-    boolean randomMethodTracktime();
+    String randomMethodTracktime();
 
-    int overloadedMethodTracktime(int input);
+    String overloadedMethodTracktime(int input);
 
-    int overloadedMethodTracktime(int input1, long input2);
+    String overloadedMethodTracktime(int input1, long input2);
 }

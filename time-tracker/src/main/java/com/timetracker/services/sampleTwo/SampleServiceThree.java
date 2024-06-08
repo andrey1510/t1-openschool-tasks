@@ -1,14 +1,10 @@
 package com.timetracker.services.sampleTwo;
 
-import com.timetracker.annotations.TrackAsyncTime;
-
 public interface SampleServiceThree {
 
     void crashingMethodTracktime();
 
-    void crashingMethodTrackAsync();
+    String randomMethodOneTrackAsync();
 
-    int randomMethodOneTrackAsync();
-
-    int randomMethodTwoTrackAsync();
+    String randomMethodTwoTrackAsync();
 }

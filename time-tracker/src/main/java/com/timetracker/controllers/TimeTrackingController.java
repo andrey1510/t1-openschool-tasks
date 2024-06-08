@@ -38,10 +38,10 @@ public class TimeTrackingController {
         @ApiResponse(responseCode = "200", description = "Ok",
             content = {@Content(mediaType = "application/json", array = @ArraySchema(
                 schema = @Schema(implementation = MethodExecutionEntry.class)))})})
-    public ResponseEntity<List<MethodExecutionEntry>> getAllCalls(){
-        List<MethodExecutionEntry> allCalls = timeTrackingService.getAllCalls();
-        if (allCalls.isEmpty()) throw new DatabaseIsEmptyException(DATABASE_IS_EMPTY);
-        return ResponseEntity.ok(allCalls);
+    public ResponseEntity<List<MethodExecutionEntry>> getAllEntries(){
+        List<MethodExecutionEntry> allEntries = timeTrackingService.getAllEntries();
+        if (allEntries.isEmpty()) throw new DatabaseIsEmptyException(DATABASE_IS_EMPTY);
+        return ResponseEntity.ok(allEntries);
     }
 
     @GetMapping("/statistics")

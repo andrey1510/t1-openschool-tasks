@@ -9,7 +9,7 @@ public interface TimeTrackingService {
 
     MethodExecutionEntry createExecutionEntry(MethodExecutionEntry methodExecutionEntry);
 
-    List<MethodExecutionEntry> getAllCalls();
+    List<MethodExecutionEntry> getAllEntries();
 
     List<MethodDurationStatistics> getDurationStatistics();
 

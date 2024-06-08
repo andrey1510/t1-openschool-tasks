@@ -33,7 +33,7 @@ public class SampleMethodsController {
     @PostMapping("/sync/fixedtime-method/{duration}")
     @Operation(description = "Запустить тестовый метод с @TrackTime, указать желаемую задержку в миллисекундах.")
     public ResponseEntity<String> launchFixedtimeMethodTracktime(
-        @Parameter(description = "Желаемая продолжительность задержки тестового метода, миллисекунды.", example = "3000")
+        @Parameter(description = "Желаемая продолжительность задержки тестового метода, миллисекунды.", example = "100")
         @PathVariable("duration") int duration) {
 
         if (duration < 0) {throw new WrongNumberException(TOO_LITTLE_DURATION);}
@@ -47,7 +47,7 @@ public class SampleMethodsController {
 
     @PostMapping("/sync/randomtime-methods/{iterations}")
     @Operation(description = "Запустить 3 тестовых метода с @TrackTime " +
-        "с рандомным временем работы (до 2 секунд); указать желаемое количество итераций.")
+        "с рандомным временем работы (до 1 секунды); указать желаемое количество итераций.")
     public ResponseEntity<String> launchRandomtimeMethodsTracktime(
         @Parameter(description = "Желаемое количество вызовов всех методов.", example = "3")
         @PathVariable("iterations") int iterations) {
@@ -90,8 +90,8 @@ public class SampleMethodsController {
     }
 
     @PostMapping("/async/randomtime-methods/{iterations}")
-    @Operation(description = "Запустить 3 тестовых метода с @TrackTime " +
-        "с рандомным временем работы (до 2 секунд); указать желаемое количество итераций.")
+    @Operation(description = "Запустить 2 тестовых метода с @TrackAsyncTime " +
+        "с рандомным временем работы (от 2 до 3 секунд); указать желаемое количество итераций.")
     public ResponseEntity<String> launchRandomtimeMethodsTrackAsync(
         @Parameter(description = "Желаемое количество вызовов всех методов.", example = "3")
         @PathVariable("iterations") int iterations) {
@@ -108,15 +108,5 @@ public class SampleMethodsController {
 
         return ResponseEntity.ok(result);
     }
-
-    @PostMapping("/async/crashing-method")
-    @Operation(description = "Запустить тестовый метод crashingMethodTrackAsync() с @TrackAsyncTime, " +
-        "который выдаст ошибку через 1 секунду после запуска.")
-    public ResponseEntity<String> launchCrashingMethodTrackAsync() {
-        sampleServiceThree.crashingMethodTrackAsync();
-        return ResponseEntity.ok("Ok");
-    }
-
-
 
 }

@@ -7,6 +7,7 @@ import com.timetracker.utils.ThreadUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.Random;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 public class SampleServiceThreeImpl implements SampleServiceThree {
@@ -14,6 +15,7 @@ public class SampleServiceThreeImpl implements SampleServiceThree {
     @TrackTime
     @Override
     public void crashingMethodTracktime(){
+        //Simulating synchronous operation with short duration.
         ThreadUtils.waitTime(1000);
         throw new IntentionallyCausedException("Method crashingMethodTracktime() из класса SampleServiceThreeImpl " +
             "пакета com.timetracker.services.sampleTwo был завершен с исключением.");
@@ -21,27 +23,27 @@ public class SampleServiceThreeImpl implements SampleServiceThree {
 
     @TrackAsyncTime
     @Override
-    public void crashingMethodTrackAsync(){
-        ThreadUtils.waitTime(1000);
-        throw new IntentionallyCausedException("Method crashingMethodTrackAsync() из класса SampleServiceThreeImpl " +
-            "пакета com.timetracker.services.sampleTwo был завершен с исключением.");
+    public String randomMethodOneTrackAsync(){
+        Random random = new Random();
+        int duration = 2000 + random.nextInt(1000);
+
+        //Simulating asynchronous operation with long duration.
+        return CompletableFuture.supplyAsync(() -> longAsyncOperation(duration)).join();
     }
 
     @TrackAsyncTime
     @Override
-    public int randomMethodOneTrackAsync(){
+    public String randomMethodTwoTrackAsync(){
         Random random = new Random();
-        int duration = 100 + random.nextInt(1901);
-        ThreadUtils.waitTime(duration);
-        return 1;
+        int duration = 2000 + random.nextInt(1000);
+
+        //Simulating asynchronous operation with long duration.
+        return CompletableFuture.supplyAsync(() -> longAsyncOperation(duration)).join();
     }
 
-    @TrackAsyncTime
-    @Override
-    public int randomMethodTwoTrackAsync(){
-        Random random = new Random();
-        int duration = 100 + random.nextInt(1901);
+    private String longAsyncOperation(int duration) {
         ThreadUtils.waitTime(duration);
-        return 2;
+        return "Async output";
     }
+
 }

@@ -13,29 +13,32 @@ public class SampleServiceTwoImpl implements SampleServiceTwo {
 
     @TrackTime
     @Override
-    public boolean randomMethodTracktime(){
+    public String randomMethodTracktime(){
+        //Simulating synchronous operation with short duration.
         Random random = new Random();
-        int duration = 100 + random.nextInt(1901);
+        int duration = 100 + random.nextInt(900);
         ThreadUtils.waitTime(duration);
-        return true;
+        return "Sync output";
     }
 
     @TrackTime
     @Override
-    public int overloadedMethodTracktime(int input){
+    public String overloadedMethodTracktime(int input){
+        //Simulating synchronous operation with short duration.
         Random random = new Random();
-        int duration = 100 + random.nextInt(1901);
+        int duration = 100 + random.nextInt(900);
         ThreadUtils.waitTime(duration);
-        return 1;
+        return "Sync output";
     }
 
     @TrackTime
     @Override
-    public int overloadedMethodTracktime(int input1, long input2){
+    public String overloadedMethodTracktime(int input1, long input2){
+        //Simulating synchronous operation with short duration.
         Random random = new Random();
-        int duration = 100 + random.nextInt(1901);
+        int duration = 100 + random.nextInt(900);
         ThreadUtils.waitTime(duration);
-        return 2;
+        return "Sync output";
     }
 
 }
