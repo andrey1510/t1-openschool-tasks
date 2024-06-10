@@ -1,0 +1,6 @@
+server:
+  port: 8865
+
+spring:
+  application:
+    name: metrics-producer

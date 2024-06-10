@@ -1,0 +1,6 @@
+server:
+  port: 8866
+
+spring:
+  application:
+    name: metrics-consumer
