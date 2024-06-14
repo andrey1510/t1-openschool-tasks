@@ -1,0 +1,46 @@
+networks:
+  metrics-network:
+    driver: bridge
+
+services:
+  zookeeper:
+    container_name: zookeeper-metrics
+    image: confluentinc/cp-zookeeper:latest
+    networks:
+      - metrics-network
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - 21181:2181
+
+  kafka:
+    container_name: kafka-metrics
+    image: confluentinc/cp-kafka:latest
+    networks:
+      - metrics-network
+    depends_on:
+      - zookeeper
+    ports:
+      - 29292:29292
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29292
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+  kafka-ui:
+    container_name: kafka-ui-metrics
+    image: provectuslabs/kafka-ui:latest
+    networks:
+      - metrics-network
+    ports:
+      - 18181:8080
+    depends_on:
+      - kafka
+    environment:
+      KAFKA_CLUSTERS_0_NAME: metrics
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+      DYNAMIC_CONFIG_ENABLED: true

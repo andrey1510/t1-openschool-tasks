@@ -1,0 +1,12 @@
+services:
+
+  app:
+    container_name: metrics-producer
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - MAVEN_SKIP_TESTS=true
+    ports:
+      - 8865:8865
+    restart: unless-stopped

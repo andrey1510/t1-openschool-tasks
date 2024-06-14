@@ -4,3 +4,23 @@ server:
 spring:
   application:
     name: metrics-consumer
+  datasource:
+    url: jdbc:postgresql://localhost:26262/metricsbase
+    username: user
+    password: password
+  jpa:
+    hibernate:
+      ddl-auto: update
+  kafka:
+    metrics-topic:
+      name: metrics-topic
+    consumer:
+      bootstrap-servers: localhost:29292
+      auto-offset-reset: earliest
+      group-id: metrics
+      key-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      properties:
+        spring.deserializer.key.delegate.class: org.apache.kafka.common.serialization.StringDeserializer
+        spring.deserializer.value.delegate.class: org.springframework.kafka.support.serializer.JsonDeserializer
+        spring.json.trusted.packages: '*'
