@@ -33,7 +33,7 @@ public class MetricsData {
     @Id
     @GeneratedValue
     @Column(name = "id", updatable = false, nullable = false)
-    @Schema(description = "Идентификатор записи метрики, присваивается случайным образом.")
+    @Schema(description = "UUID снятия метрики, присваивается случайным образом.")
     private UUID id;
 
     @ManyToOne(cascade = CascadeType.ALL)
@@ -42,7 +42,7 @@ public class MetricsData {
 
     @Column(name = "timestamp", updatable = false, nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
-    @Schema(description = "Время взятия метрики.")
+    @Schema(description = "Время снятия метрики.")
     private LocalDateTime timestamp;
 
     @Column(name = "value", updatable = false, nullable = false)

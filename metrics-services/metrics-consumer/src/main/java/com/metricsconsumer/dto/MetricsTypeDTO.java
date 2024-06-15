@@ -15,7 +15,7 @@ import lombok.Setter;
 @Schema(description = "Имя и описание метрики.")
 public class MetricsTypeDTO {
 
-    @Schema(description = "Имя метрики.")
+    @Schema(description = "Идентификатор (имя) метрики.")
     private String name;
 
     @Schema(description = "Описание метрики.")

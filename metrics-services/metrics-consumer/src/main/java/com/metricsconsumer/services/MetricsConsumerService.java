@@ -2,11 +2,13 @@ package com.metricsconsumer.services;
 
 import com.metricsconsumer.dto.MetricsDataDTO;
 import com.metricsconsumer.dto.MetricsTypeDTO;
+import com.metricsconsumer.models.MetricsType;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface MetricsConsumerService {
 
@@ -20,4 +22,7 @@ public interface MetricsConsumerService {
     List<MetricsTypeDTO> getMetricsTypes();
 
     List<MetricsDataDTO> findMetricsByName(String name);
+
+    @Transactional(readOnly = true)
+    Optional<MetricsType> getMetricTypeByName(String name);
 }

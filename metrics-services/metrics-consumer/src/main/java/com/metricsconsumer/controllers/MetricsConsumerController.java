@@ -2,8 +2,12 @@ package com.metricsconsumer.controllers;
 
 import com.metricsconsumer.dto.MetricsDataDTO;
 import com.metricsconsumer.dto.MetricsTypeDTO;
+import com.metricsconsumer.exceptions.DatabaseIsEmptyException;
+import com.metricsconsumer.exceptions.MetricsDataNotFoundException;
+import com.metricsconsumer.exceptions.MetricsTypeNotFoundException;
 import com.metricsconsumer.services.MetricsConsumerService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -24,6 +28,10 @@ import java.util.List;
 @Schema(description = "Все операции по получению метрик из базы.")
 public class MetricsConsumerController {
 
+    private final String METRICS_DATA_NOT_FOUND = "В базе не найдено данных запрошенного типа метрики.";
+    private final String METRICS_TYPE_NOT_FOUND = "В базе не найдено запрошенного типа метрики.";
+    private final String DATABASE_IS_EMPTY = "В базе не содержится метрик.";
+
     private final MetricsConsumerService metricsConsumerService;
 
     @GetMapping("/metrics")
@@ -34,6 +42,7 @@ public class MetricsConsumerController {
                 schema = @Schema(implementation = MetricsTypeDTO.class)))})})
     public ResponseEntity<List<MetricsTypeDTO>> getMetricsTypes(){
         List<MetricsTypeDTO> types = metricsConsumerService.getMetricsTypes();
+        if (types.isEmpty()) throw new DatabaseIsEmptyException(DATABASE_IS_EMPTY);
         return ResponseEntity.ok(types);
     }
 
@@ -43,8 +52,16 @@ public class MetricsConsumerController {
         @ApiResponse(responseCode = "200", description = "Ok",
             content = {@Content(mediaType = "application/json", array = @ArraySchema(
                 schema = @Schema(implementation = MetricsTypeDTO.class)))})})
-    public ResponseEntity<List<MetricsDataDTO>> getMetricsByName(@PathVariable("id") String id){
+    public ResponseEntity<List<MetricsDataDTO>> getMetricsByName(
+        @Parameter(description = "Идентификатор (имя) метрики.", example = "process.uptime")
+        @PathVariable("id") String id){
+
+        if(metricsConsumerService.getMetricTypeByName(id).isEmpty())
+            throw new MetricsTypeNotFoundException(METRICS_TYPE_NOT_FOUND);
+
         List<MetricsDataDTO> metrics = metricsConsumerService.findMetricsByName(id);
+        if (metrics.isEmpty()) throw new MetricsDataNotFoundException(METRICS_DATA_NOT_FOUND);
+
         return ResponseEntity.ok(metrics);
     }
 }

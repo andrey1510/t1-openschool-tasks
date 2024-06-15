@@ -1,5 +1,5 @@
 package com.metricsproducer.services;
 
 public interface MetricsProducerService {
-    void sendProcessCpuTimeMetrics();
+    void sendMetrics(String metricsGroupType);
 }

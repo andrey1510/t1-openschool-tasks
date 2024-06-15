@@ -13,9 +13,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.apache.kafka.common.header.Header;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -35,35 +37,28 @@ public class MetricsConsumerServiceImpl implements MetricsConsumerService {
     @Transactional
     public void receiveMetrics(ConsumerRecord<String, String> message) {
 
-        String kafkaKey = message.key();
-        String kafkaValue = message.value();
+        log.info("Message received: key: {}, value: {}", message.key(), message.value());
 
-        log.info("Message received: key: {}, value: {}", kafkaKey, kafkaValue);
+        LocalDateTime timestamp = LocalDateTime.parse(
+            new String(message.headers().lastHeader("timestamp").value(), StandardCharsets.UTF_8),
+            DateTimeFormatter.ISO_LOCAL_DATE_TIME);
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode root;
-        try {
-            root = objectMapper.readTree(kafkaValue);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+        JsonNode extractedJson = extractJson(message.value());
 
-        Optional<MetricsType> metricsTypeAlreadySaved = metricsTypeRepository.findById(root.get("name").asText());
+        Optional<MetricsType> metricsTypeExists = metricsTypeRepository.findById(extractedJson.get("name").asText());
 
-        MetricsType metricsType = metricsTypeAlreadySaved.orElseGet(() -> MetricsType.builder()
-            .name(root.get("name").asText())
-            .description(root.get("description").asText())
-            .baseUnit(root.get("baseUnit").asText())
+        MetricsType metricsType = metricsTypeExists.orElseGet(() -> MetricsType.builder()
+            .name(extractedJson.get("name").asText())
+            .description(extractedJson.get("description").asText())
+            .baseUnit(extractedJson.get("baseUnit").asText())
             .build());
-        MetricsData metricsData = MetricsData.builder()
+
+        if (metricsTypeExists.isEmpty()) metricsTypeRepository.save(metricsType);
+        metricsDataRepository.save(MetricsData.builder()
             .metricsType(metricsType)
-            .timestamp(LocalDateTime.parse(kafkaKey, DateTimeFormatter.ISO_LOCAL_DATE_TIME))
-            .value(root.get("measurements").get(0).get("value").asDouble())
-            .build();
-
-        if (!metricsTypeAlreadySaved.isPresent()) metricsTypeRepository.save(metricsType);
-        metricsDataRepository.save(metricsData);
-
+            .timestamp(timestamp)
+            .value(extractedJson.get("measurements").get(0).get("value").asDouble())
+            .build());
     }
 
     @Override
@@ -76,5 +71,19 @@ public class MetricsConsumerServiceImpl implements MetricsConsumerService {
     @Transactional(readOnly = true)
     public List<MetricsDataDTO> findMetricsByName(String name) {
         return metricsDataRepository.findMetricsByName(name);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<MetricsType> getMetricTypeByName(String name){
+        return metricsTypeRepository.findById(name);
+    }
+
+    private JsonNode extractJson(String messageValue){
+        try {
+            return new ObjectMapper().readTree(messageValue);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

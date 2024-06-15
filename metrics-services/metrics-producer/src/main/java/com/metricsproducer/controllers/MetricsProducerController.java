@@ -18,13 +18,14 @@ public class MetricsProducerController {
     private final MetricsProducerService metricsProducerService;
 
     @PostMapping("/metrics")
-    @Operation(description = "Отправить один раз метрики jvm.memory.used, process.uptime, process.cpu.time " +
-        "в другой сервис.")
+    @Operation(description = "Отправить один раз метрики в другой сервис все отслеживаемые метрики " +
+        "(jvm.memory.used, jvm.memory.committed, process.uptime, process.cpu.time.")
     public ResponseEntity<String> sendMetrics() {
 
-        metricsProducerService.sendProcessCpuTimeMetrics();
+        metricsProducerService.sendMetrics("jvm-metrics");
+        metricsProducerService.sendMetrics("process-metrics");
 
-        return ResponseEntity.ok("Метрики отправлены");
+        return ResponseEntity.ok("Отправлены метрики: jvm.memory.used, jvm.memory.committed, process.uptime, process.cpu.time)");
     }
 
 }

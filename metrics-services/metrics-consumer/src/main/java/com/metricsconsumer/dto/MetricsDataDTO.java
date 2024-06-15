@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @Schema(description = "Записи со статистикой по конкретной метрике.")
 public class MetricsDataDTO {
 
-    @Schema(description = "Время взятия метрики.")
+    @Schema(description = "Время снятия метрики.")
     private LocalDateTime timestamp;
 
     @Schema(description = "Значение метрики.")
