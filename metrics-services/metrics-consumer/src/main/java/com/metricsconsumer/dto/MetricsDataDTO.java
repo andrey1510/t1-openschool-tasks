@@ -15,13 +15,13 @@ import java.time.LocalDateTime;
 @Schema(description = "Записи со статистикой по конкретной метрике.")
 public class MetricsDataDTO {
 
-    @Schema(description = "Время снятия метрики.")
+    @Schema(description = "Время снятия метрики.", example = "2024-06-16T16:11:19.869285")
     private LocalDateTime timestamp;
 
-    @Schema(description = "Значение метрики.")
+    @Schema(description = "Значение метрики.", example = "845.287")
     private Double value;
 
-    @Schema(description = "Единица измерения метрики.")
+    @Schema(description = "Единица измерения метрики.", example = "seconds")
     private String baseUnit;
 
 }

@@ -56,7 +56,7 @@ public class MetricsConsumerServiceImpl implements MetricsConsumerService {
             .timestamp(timestamp)
             .value(extractedJson.get("measurements").get(0).get("value").asDouble())
             .build();
-        if (metricsTypeExists.isEmpty()) metricsTypeRepository.save(metricsType);
+        if (metricsTypeExists.isPresent()) metricsTypeRepository.save(metricsType);
 
         metricsDataRepository.save(metricsData);
     }

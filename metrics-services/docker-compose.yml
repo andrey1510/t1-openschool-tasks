@@ -3,6 +3,7 @@ networks:
     driver: bridge
 
 services:
+
   zookeeper:
     container_name: zookeeper-metrics
     image: confluentinc/cp-zookeeper:latest
@@ -44,3 +45,51 @@ services:
       KAFKA_CLUSTERS_0_NAME: metrics
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
       DYNAMIC_CONFIG_ENABLED: true
+
+  metrics-consumer-app:
+    container_name: metrics-consumer
+    build:
+      context: ./metrics-consumer
+      dockerfile: Dockerfile
+      args:
+        - MAVEN_SKIP_TESTS=true
+    networks:
+      - metrics-network
+    environment:
+      - SPRING_KAFKA_CONSUMER_BOOTSTRAP-SERVERS=kafka:9092
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://metrics-consumer-db:5432/metricsbase
+      - SPRING_DATASOURCE_USERNAME=user
+      - SPRING_DATASOURCE_PASSWORD=password
+    ports:
+      - 8866:8866
+    depends_on:
+      - metrics-consumer-db
+    restart: unless-stopped
+
+  metrics-consumer-db:
+    container_name: metrics-db
+    image: postgres:15
+    networks:
+      - metrics-network
+    environment:
+      - POSTGRES_DB=metricsbase
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+    ports:
+      - 26262:5432
+    restart: unless-stopped
+
+  metrics-producer-app:
+    container_name: metrics-producer
+    build:
+      context: ./metrics-producer
+      dockerfile: Dockerfile
+      args:
+        - MAVEN_SKIP_TESTS=true
+    networks:
+      - metrics-network
+    environment:
+      - SPRING_KAFKA_PRODUCER_BOOTSTRAP-SERVERS=kafka:9092
+    ports:
+      - 8865:8865
+    restart: unless-stopped

@@ -13,10 +13,10 @@ import lombok.Setter;
 @Schema(description = "Имя и описание метрики.")
 public class MetricsTypeDTO {
 
-    @Schema(description = "Идентификатор (имя) метрики.")
+    @Schema(description = "Идентификатор (имя) метрики.", example = "jvm.memory.used")
     private String name;
 
-    @Schema(description = "Описание метрики.")
+    @Schema(description = "Описание метрики.", example = "The amount of used memory")
     private String description;
 
 }

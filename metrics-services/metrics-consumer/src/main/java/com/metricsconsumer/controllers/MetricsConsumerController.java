@@ -35,7 +35,7 @@ public class MetricsConsumerController {
     private final MetricsConsumerService metricsConsumerService;
 
     @GetMapping("/metrics")
-    @Operation(description = "Выдать все типы метрик в базе.")
+    @Operation(description = "Получить все типы метрик в базе.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Ok",
             content = {@Content(mediaType = "application/json", array = @ArraySchema(
@@ -47,7 +47,7 @@ public class MetricsConsumerController {
     }
 
     @GetMapping("/metrics{id}")
-    @Operation(description = "Выдать все записи метрики в базе по ее идентификатору(имени).")
+    @Operation(description = "Получить все записи метрики в базе по ее идентификатору(имени).")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Ok",
             content = {@Content(mediaType = "application/json", array = @ArraySchema(

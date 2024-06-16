@@ -8,37 +8,46 @@ __README__
 -----------------------------------
 
 Нужно склонировать репозиторий. Затем запустить Kafka, два сервиса: **metrics-consumer** (и его базу PostgreSQL) и **metrics-producer**, согласно инструкциям ниже.
-Каждый файл docker-compose следует запускать с помощью IDE, или выполнив команды ```docker-compose build``` и ```docker-compose up -d``` в директории, где лежит соответствующий файл.
 
-**Kafka**
+**Вариант 1 - запуск в Docker**
 
-1. Запустить файл **docker-compose.yml** (в директории с этим Readme). В результате будет создан и запущен контейнер с сервером Kafka.
-2. Или же создать на Вашем сервере Kafka брокера на порту ```29292```.
+В директории ```t1-openschool-tasks\metrics-services``` запустить файл **docker-compose.yml** (). Его следует запускать с помощью IDE, или выполнив команды ```docker-compose build``` и ```docker-compose up -d``` в директории, где он находится.
+В результате будут созданы и запущены контейнеры:
+1. kafka-metrics - сервер Kafka;
+2. zookeeper - Zookeeper для сервера Kafka;
+3. kafka-ui - UI для сервер Kafka;
+4. metrics-producer - сервис metric-producer;
+5. metrics-consumer - сервис metric-consumer;
+6. metrics-db - база PostgreSQL для сервиса metric-consumer.
 
-**Сервисы metrics-consumer (с базой) и metrics-producer**
+**Вариант 2 - запуск в IDE**
 
-*Вариант 1: Запуск в IDE**
+Нужно создать базу PostgreSQL и сервер Kafka:
+1. запустить **docker-compose.yml** как указано выше, затем остановить контейнеры metrics-producer и metrics-consumer; 
+2. или создать на Вашем сервере PostreSQL соответствующую базу PostreSQL с параметрами:
 
-Нужно создать базу PostgreSQL для чего надо:
+   хост, порт и база: ```localhost:26262/metricsbase```
 
-1. Найти в директории ```t1-openschool-tasks\metrics-consumer``` файл **docker-compose.yml** и запустить в нем сервис **metrics-db**. В результате будет создан и запущен контейнер с базой банных.
-2. Или же создать в вашем PostgreSQL базу с параметрами из указанного файла **docker-compose.yml**
+      имя пользователя: ```user```
 
-После создания базы запустить исходный код приложений **metrics-consumer** и **metrics-producer** в IDE.
+      пароль: ```password```
 
-*Вариант 2: установка в Docker-контейнер*
+   и создать на Вашем сервере Kafka брокера Kafka с параметрами:
 
-В директориях ```t1-openschool-tasks\metrics-consumer``` и ```t1-openschool-tasks\metrics-producer``` запустите файлы **docker-compose.yml**. В результате будут созданы контейнеры с сервисами и базой банных.
+      хост и порт: ```localhost:29292```
 
-*Вариант 3: установка в jar-файл*
+После этого запустить исходный код приложений **metrics-consumer** и **metrics-producer** в IDE.
 
-Создайте базу данных PostgreSQL как указано выше.
 
-На устройстве должна быть установлена Java. В директории ```t1-openschool-tasks\metrics-consumer``` склонированного репозитория откройте GitBash и выполните команду:
+**Вариант 3 - установка в jar-файл**
+
+Создать базу PostreSQL и сервер Kafka, как указано выше.
+
+На устройстве должна быть установлена Java. В директории ```t1-openschool-tasks\metrics-services\metrics-consumer``` склонированного репозитория откройте GitBash и выполните команду:
 
 ```./mvnw clean package```
 
-В директории ```t1-openschool-tasks\metrics-consumer\target``` появится jar файл. Откройте GitBash в этой директории и выполните команду для запуска приложения:
+В директории ```t1-openschool-tasks\metrics-services\metrics-consumer\target``` появится jar файл. Откройте GitBash в этой директории и выполните команду для запуска приложения:
 
 ```java -jar [имя jar файла]```
 
@@ -46,18 +55,18 @@ __README__
 
 ```java -jar metrics-consumer-1.0.0-SNAPSHOT.jar```
 
-Повторите процедуру со вторым сервисом в директории ```t1-openschool-tasks\metrics-producer```.
+Повторите процедуру со вторым сервисом в директории ```t1-openschool-tasks\metrics-services\metrics-producer```.
 
 Работа с приложением:
 ---------------------------------------
 
 После запуска сервисы приложения будут доступны по адресам:
-**metrics-producer** http://localhost:8865
-**metrics-consumer** http://localhost:8866
+**metrics-producer** - http://localhost:8865
+**metrics-consumer** - http://localhost:8866
 
 Приложение поддерживает Swagger. Получить доступ к Swagger UI можно по адресам:
-http://localhost:8865/swagger-ui.html.
-http://localhost:8866/swagger-ui.html.
+**metrics-producer** - http://localhost:8865/swagger-ui.html.
+**metrics-consumer** - http://localhost:8866/swagger-ui.html.
 
 Документация содержится в Swagger.
 
@@ -76,7 +85,9 @@ http://localhost:18181/
 
 Затем он отправляет их с помощью Apache Kafka в сервис metrics-consumer.
 
-Сервис **metrics-consumer** получает метрики и сохраняет их данные в своей базе. В настоящее время принимаются и обрабатываются одинаково все метрики. Поскольку название группы метрик (сейчас всего две группы - jvm-metrics и process-metrics) указывается в сообщении Kafka в качестве ключа, в дальшейм при необходимости можно предумотреть различную обработку разных групп.
+Через Apache Kafka отправляется следующее сообщение: присвоенная группа метрик (например, jvm-metrics) в качестве key, все данные конкретной снятой метрики с качестве value, тайштамп снятия метрики в header.
+
+Сервис **metrics-consumer** получает метрики, обрабатывает их и сохраняет их данные в своей базе. В настоящее время принимаются и обрабатываются одинаково все метрики. Поскольку название группы метрик (сейчас имеется две группы - jvm-metrics и process-metrics) указывается в сообщении Kafka в качестве ключа, в дальнейшем при необходимости можно предусмотреть различную обработку разных групп.
 
 ### Контроллер MetricsProducerController сервиса metrics-producer
 
