@@ -13,7 +13,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.kafka.annotation.KafkaListener;
-import org.apache.kafka.common.header.Header;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -52,13 +51,14 @@ public class MetricsConsumerServiceImpl implements MetricsConsumerService {
             .description(extractedJson.get("description").asText())
             .baseUnit(extractedJson.get("baseUnit").asText())
             .build());
-
-        if (metricsTypeExists.isEmpty()) metricsTypeRepository.save(metricsType);
-        metricsDataRepository.save(MetricsData.builder()
+        MetricsData metricsData = MetricsData.builder()
             .metricsType(metricsType)
             .timestamp(timestamp)
             .value(extractedJson.get("measurements").get(0).get("value").asDouble())
-            .build());
+            .build();
+        if (metricsTypeExists.isEmpty()) metricsTypeRepository.save(metricsType);
+
+        metricsDataRepository.save(metricsData);
     }
 
     @Override

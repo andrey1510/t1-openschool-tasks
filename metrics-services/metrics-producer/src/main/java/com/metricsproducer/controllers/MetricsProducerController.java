@@ -25,7 +25,7 @@ public class MetricsProducerController {
         metricsProducerService.sendMetrics("jvm-metrics");
         metricsProducerService.sendMetrics("process-metrics");
 
-        return ResponseEntity.ok("Отправлены метрики: jvm.memory.used, jvm.memory.committed, process.uptime, process.cpu.time)");
+        return ResponseEntity.ok("Отправлены метрики: jvm.memory.used, jvm.memory.committed, process.uptime, process.cpu.time");
     }
 
 }
