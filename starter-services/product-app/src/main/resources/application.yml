@@ -1,0 +1,6 @@
+server:
+  port: 8558
+
+spring:
+  application:
+    name: product-app

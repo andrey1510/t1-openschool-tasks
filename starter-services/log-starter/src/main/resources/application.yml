@@ -1,0 +1,10 @@
+server:
+  port: 8544
+
+spring:
+  application:
+    name: log-starter
+
+logging:
+  level:
+    root: info
