@@ -1,19 +1,18 @@
-package com.logstarter.services;
+package com.logstarter.filters;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
-import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
-@Component
+//@Component
+@Slf4j
 public class OutgoingInterceptor implements ClientHttpRequestInterceptor {
 
-    private static final Logger logger = LoggerFactory.getLogger(OutgoingInterceptor.class);
+    //private static final Logger logger = LoggerFactory.getLogger(OutgoingInterceptor.class);
 
     @Override
     public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
@@ -21,12 +20,12 @@ public class OutgoingInterceptor implements ClientHttpRequestInterceptor {
         ClientHttpResponse response = execution.execute(request, body);
         long duration = System.currentTimeMillis() - start;
 
-        logger.info("Outgoing request: {} {}", request.getMethod(), request.getURI());
-        logger.info("Outgoing request Headers: {}", request.getHeaders());
+        log.info("Outgoing request: {} {}", request.getMethod(), request.getURI().toURL());
+        log.info("Headers of outgoing request : {}", request.getHeaders());
 
-        logger.info("Response to Outgoing request Code: {}", response.getStatusCode());
-        logger.info("Response to Outgoing request Headers: {}", response.getHeaders());
-        logger.info("Outgoing request Duration: {}ms", duration);
+        log.info("Code of response to outgoing request : {}", response.getStatusCode());
+        log.info("Headers of response to outgoing request : {}", response.getHeaders());
+        log.info("Duration of outgoing request : {}ms", duration);
 
         return response;
     }
