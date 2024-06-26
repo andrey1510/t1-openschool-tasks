@@ -4,6 +4,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StopWatch;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -15,14 +16,17 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
+@Getter
 public class IngoingFilter extends OncePerRequestFilter {
 
-    private final String INGOING_REQUEST_METHOD = "Ingoing request method";
-    private final String INGOING_REQUEST_URL = "Ingoing request URL";
-    private final String INGOING_REQUEST_HEADERS = "Ingoing request headers";
-    private final String INGOING_REQUEST_RESPONSE_CODE = "Code of response to ingoing request";
-    private final String INGOING_REQUEST_RESPONSE_HEADERS = "Headers of response to ingoing request";
-    private final String INGOING_REQUEST_DURATION = "Ingoing request duration, ms.";
+    private static final String INGOING_REQUEST_METHOD = "Ingoing request method";
+    private static final String INGOING_REQUEST_URL = "Ingoing request URL";
+    private static final String INGOING_REQUEST_HEADERS = "Ingoing request headers";
+    private static final String INGOING_REQUEST_RESPONSE_CODE = "Code of response to ingoing request";
+    private static final String INGOING_REQUEST_RESPONSE_HEADERS = "Headers of response to ingoing request";
+    private static final String INGOING_REQUEST_DURATION = "Ingoing request duration, ms.";
+
+    private final Map<String, String> logMessages = new HashMap<>();
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -36,7 +40,7 @@ public class IngoingFilter extends OncePerRequestFilter {
         } finally {
             stopWatch.stop();
 
-            Map<String, String> logMessages = createLogMap(request, response, stopWatch);
+            fillLogMap(request, response, stopWatch);
 
             StringBuilder logMessageBuilder = new StringBuilder();
             logMessages.forEach((key, value) -> logMessageBuilder.append(key).append(": ").append(value).append("\n"));
@@ -44,8 +48,7 @@ public class IngoingFilter extends OncePerRequestFilter {
         }
     }
 
-    private Map<String, String> createLogMap(
-        HttpServletRequest request, HttpServletResponse response, StopWatch stopWatch) {
+    private void fillLogMap(HttpServletRequest request, HttpServletResponse response, StopWatch stopWatch) {
 
         String requestHeaders = Collections.list(request.getHeaderNames()).stream()
             .map(headerName -> headerName + ": " + request.getHeader(headerName))
@@ -54,16 +57,17 @@ public class IngoingFilter extends OncePerRequestFilter {
             .map(headerName -> headerName + ": " + response.getHeader(headerName))
             .collect(Collectors.joining("; "));
 
-        Map<String, String> logMessages = new HashMap<>();
         logMessages.put(INGOING_REQUEST_METHOD, request.getMethod());
         logMessages.put(INGOING_REQUEST_URL, request.getRequestURL().toString());
         logMessages.put(INGOING_REQUEST_HEADERS, requestHeaders);
         logMessages.put(INGOING_REQUEST_RESPONSE_CODE, String.valueOf(response.getStatus()));
         logMessages.put(INGOING_REQUEST_RESPONSE_HEADERS, responseHeaders);
         logMessages.put(INGOING_REQUEST_DURATION, String.valueOf(stopWatch.getTotalTimeMillis()));
-        return logMessages;
     }
 
+    public Map<String, String> getLogMessages() {
+        return logMessages;
+    }
 }
 
 
