@@ -1,61 +1,57 @@
 package com.logstarter.filters;
 
-import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.ServletRequest;
-import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.StopWatch;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
-//@Component
-public class IngoingFilter implements Filter {
+public class IngoingFilter extends OncePerRequestFilter {
 
-    //extends OncePerRequestFilter {
-
-    //
-
-   // private static final Logger logger = LoggerFactory.getLogger(IngoingFilter.class);
+    private final String INGOING_REQUEST_METHOD = "Ingoing request method";
+    private final String INGOING_REQUEST_URL = "Ingoing request URL";
+    private final String INGOING_REQUEST_HEADERS = "Ingoing request headers";
+    private final String INGOING_REQUEST_RESPONSE_CODE = "Code of response to ingoing request";
+    private final String INGOING_REQUEST_RESPONSE_HEADERS = "Headers of response to ingoing request";
+    private final String INGOING_REQUEST_DURATION = "Ingoing request duration, ms.";
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-        throws IOException, ServletException {
-        long startTime = System.currentTimeMillis();
-        HttpServletRequest httpRequest = (HttpServletRequest) request;
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
 
-        log.info("Incoming request: {} {}", httpRequest.getMethod(), httpRequest.getRequestURL());
-        log.info("Headers of incoming request : {}", httpRequest.getHeaderNames());
+        try {
+            filterChain.doFilter(request, response);
+        } finally {
+            stopWatch.stop();
 
-        HttpServletResponse httpResponse = (HttpServletResponse) response;
-        chain.doFilter(request, response);
+            String requestHeaders = Collections.list(request.getHeaderNames()).stream()
+                .map(headerName -> headerName + ": " + request.getHeader(headerName))
+                .collect(Collectors.joining("; "));
+            String responseHeaders = response.getHeaderNames().stream()
+                .map(headerName -> headerName + ": " + response.getHeader(headerName))
+                .collect(Collectors.joining("; "));
 
-        long duration = System.currentTimeMillis() - startTime;
+            Map<String, String> logMessages = new HashMap<>();
+            logMessages.put(INGOING_REQUEST_METHOD, request.getMethod());
+            logMessages.put(INGOING_REQUEST_URL, request.getRequestURL().toString());
+            logMessages.put(INGOING_REQUEST_HEADERS, requestHeaders);
+            logMessages.put(INGOING_REQUEST_RESPONSE_CODE, String.valueOf(response.getStatus()));
+            logMessages.put(INGOING_REQUEST_RESPONSE_HEADERS, responseHeaders);
+            logMessages.put(INGOING_REQUEST_DURATION, String.valueOf(stopWatch.getTotalTimeMillis()));
 
-        log.info("Code of response to incoming request: {}", httpResponse.getStatus());
-        log.info("Headers of response to incoming request : {}", httpResponse.getHeaderNames());
-        log.info("Duration of incoming request : {}ms", duration);
+            StringBuilder logMessageBuilder = new StringBuilder();
+            logMessages.forEach((key, value) -> logMessageBuilder.append(key).append(": ").append(value).append("\n"));
+            log.info("\n" + logMessageBuilder);
+        }
     }
-//    @Override
-//    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-//        StopWatch stopWatch = new StopWatch();
-//        stopWatch.start();
-//
-//        try {
-//            // Логирование запроса
-//            logger.info("Received {} request to {}", request.getMethod(), request.getRequestURL());
-//            logger.info("Request headers: {}", request.getHeaderNames());
-//
-//            filterChain.doFilter(request, response);
-//
-//            // Логирование ответа
-//            logger.info("Response status: {}", response.getStatus());
-//        } finally {
-//            stopWatch.stop();
-//            logger.info("Request processing time: {} ms", stopWatch.getTotalTimeMillis());
-//        }
-//    }
 }

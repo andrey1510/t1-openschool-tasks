@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestTemplate;
 
 @RestController
 @RequestMapping("/test-starter")
@@ -17,31 +16,23 @@ public class ProductController {
 
     private final ProductService productService;
 
-    private final RestTemplate restTemplate = new RestTemplate();
-
-
     @GetMapping("/send-and-receive-string")
     public ResponseEntity<String> receiveString(
-        @RequestParam(value = "send input string", required = false) String str){
+        @RequestParam(value = "send input string", required = false) String str) {
         return ResponseEntity.ok(productService.receiveString(str));
     }
 
     @GetMapping("/request-and-receive")
     public ResponseEntity<String> requestAndReceive(){
-
         String url = "http://localhost:8559/help-test-starter/receive-and-return-string";
-
-        ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
-
-        return response;
+        return productService.requestAndReceive(url);
     }
 
 
     @GetMapping("/receive-info/{id}")
     public ResponseEntity<String> getUserById(@PathVariable Long id) {
         String url = "https://jsonplaceholder.typicode.com/users/" + id;
-        ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
-        return response;
+        return productService.getUserById(url);
     }
 
 }

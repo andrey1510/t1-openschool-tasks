@@ -8,3 +8,9 @@ spring:
 logging:
   level:
     root: info
+
+logger:
+  ingoing:
+    enabled: true
+  outgoing:
+    enabled: true

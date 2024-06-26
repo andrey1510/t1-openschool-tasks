@@ -7,27 +7,46 @@ import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
-//@Component
 @Slf4j
 public class OutgoingInterceptor implements ClientHttpRequestInterceptor {
 
-    //private static final Logger logger = LoggerFactory.getLogger(OutgoingInterceptor.class);
+    private final String OUTGOING_REQUEST_METHOD = "Outgoing request method";
+    private final String OUTGOING_REQUEST_URL = "Outgoing request URL";
+    private final String OUTGOING_REQUEST_HEADERS = "Outgoing request headers";
+    private final String OUTGOING_REQUEST_RESPONSE_CODE = "Code of response to outgoing request";
+    private final String OUTGOING_REQUEST_RESPONSE_HEADERS = "Headers of response to outgoing request";
+    private final String OUTGOING_REQUEST_DURATION = "Outgoing request duration, ms.";
 
     @Override
     public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
+        ClientHttpResponse response;
         long start = System.currentTimeMillis();
-        ClientHttpResponse response = execution.execute(request, body);
-        long duration = System.currentTimeMillis() - start;
+        String responseHeaders;
+        String responseCode;
 
-        log.info("Outgoing request: {} {}", request.getMethod(), request.getURI().toURL());
-        log.info("Headers of outgoing request : {}", request.getHeaders());
+        try {
+            response = execution.execute(request, body);
+        } catch (Exception e) {
+            responseCode = response.getStatusCode().toString();
+            responseHeaders = response.getHeaders().toString();
+        } finally {
 
-        log.info("Code of response to outgoing request : {}", response.getStatusCode());
-        log.info("Headers of response to outgoing request : {}", response.getHeaders());
-        log.info("Duration of outgoing request : {}ms", duration);
 
-        return response;
+            Map<String, String> logMessages = new HashMap<>();
+            long duration = System.currentTimeMillis() - start;
+            logMessages.put(OUTGOING_REQUEST_METHOD, request.getMethod().toString());
+            logMessages.put(OUTGOING_REQUEST_URL, request.getURI().toString());
+            logMessages.put(OUTGOING_REQUEST_HEADERS, request.getHeaders().toString());
+            logMessages.put(OUTGOING_REQUEST_RESPONSE_CODE, responseCode);
+            logMessages.put(OUTGOING_REQUEST_RESPONSE_HEADERS, responseHeaders);
+            logMessages.put(OUTGOING_REQUEST_DURATION, String.valueOf(duration));
+
+            log.info(logMessages.toString());
+        }
+            return response;
+
     }
-
 }
