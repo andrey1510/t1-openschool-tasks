@@ -38,7 +38,7 @@ public class OutgoingInterceptor implements ClientHttpRequestInterceptor {
             responseHeaders = response.getStatusCode().toString();
             responseCode = response.getHeaders().toString();
         } finally {
-            createLogMap(request, start, responseHeaders, responseCode);
+            fillLogMap(request, start, responseHeaders, responseCode);
 
             StringBuilder logMessageBuilder = new StringBuilder();
             logMessages.forEach((key, value) -> logMessageBuilder.append(key).append(": ").append(value).append("\n"));
@@ -47,7 +47,7 @@ public class OutgoingInterceptor implements ClientHttpRequestInterceptor {
             return response;
     }
 
-    private void createLogMap(HttpRequest request, long start, String responseHeaders, String responseCode){
+    private void fillLogMap(HttpRequest request, long start, String responseHeaders, String responseCode){
         long duration = System.currentTimeMillis() - start;
         logMessages.put(OUTGOING_REQUEST_METHOD, request.getMethod().toString());
         logMessages.put(OUTGOING_REQUEST_URL, request.getURI().toString());

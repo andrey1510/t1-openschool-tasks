@@ -1,6 +1,7 @@
 package com.logstarter.controllerTests;
 
 import com.logstarter.filters.IngoingFilter;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,17 +21,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class IngoingFilterTests {
 
     @Autowired
-    private final MockMvc mockMvc;
+    private MockMvc mockMvc;
 
     @Autowired
-    private final IngoingFilter ingoingFilter;
+    private IngoingFilter ingoingFilter;
 
     @Test
     @SneakyThrows
     public void ingoingFilterIsOkTest() {
 
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
-            .get("/samples/request-and-receive-error").header("SomeHeader", "HeaderValue");
+            .get("/samples/request-and-receive-response").header("SomeHeader", "HeaderValue");
         mockMvc.perform(requestBuilder)
             .andExpect(MockMvcResultMatchers.status().isOk());
 
@@ -42,7 +43,7 @@ public class IngoingFilterTests {
         assertThat(logMessages.get("Ingoing request duration, ms.")).isNotNull();
         assertThat(logMessages.get("Headers of response to ingoing request")).isNotNull();
         assertThat(logMessages.get("Ingoing request URL"))
-            .isEqualTo("http://localhost/samples/request-and-receive-error");
+            .isEqualTo("http://localhost/samples/request-and-receive-response");
     }
 
     @Test

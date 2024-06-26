@@ -11,12 +11,12 @@ public class LogAutoConfiguration {
 
 
     @Bean
-    @ConditionalOnExpression("${logger.outgoing.enabled:false}")
+    @ConditionalOnExpression("${logger.outgoing.enabled:true}")
     public OutgoingInterceptor outgoingInterceptor() {
         return new OutgoingInterceptor();
     }
 
-    @ConditionalOnExpression("${logger.ingoing.enabled:false}")
+    @ConditionalOnExpression("${logger.ingoing.enabled:true}")
     @Bean
     public IngoingFilter ingoingFilter(){
         return new IngoingFilter();
