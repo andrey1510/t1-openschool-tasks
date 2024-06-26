@@ -64,10 +64,6 @@ public class IngoingFilter extends OncePerRequestFilter {
         logMessages.put(INGOING_REQUEST_RESPONSE_HEADERS, responseHeaders);
         logMessages.put(INGOING_REQUEST_DURATION, String.valueOf(stopWatch.getTotalTimeMillis()));
     }
-
-  //  public Map<String, String> getLogMessages() {
-    //    return logMessages;
-    //}
 }
 
 

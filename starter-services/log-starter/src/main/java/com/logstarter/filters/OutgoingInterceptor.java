@@ -35,8 +35,8 @@ public class OutgoingInterceptor implements ClientHttpRequestInterceptor {
 
         try {
             response = execution.execute(request, body);
-            responseHeaders = response.getStatusCode().toString();
-            responseCode = response.getHeaders().toString();
+            responseHeaders = response.getHeaders().toString();
+            responseCode = response.getStatusCode().toString();
         } finally {
             fillLogMap(request, start, responseHeaders, responseCode);
 

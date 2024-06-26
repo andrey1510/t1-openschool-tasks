@@ -1,7 +1,6 @@
 package com.logstarter.controllerTests;
 
 import com.logstarter.filters.IngoingFilter;
-import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
