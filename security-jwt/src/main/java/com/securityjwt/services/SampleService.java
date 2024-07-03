@@ -1,6 +1,6 @@
 package com.securityjwt.services;
 
-public interface ProductService {
+public interface SampleService {
     String checkPerformerAccess();
 
     String checkCustomerAccess();

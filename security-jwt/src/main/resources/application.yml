@@ -15,8 +15,8 @@ spring:
 jwt:
   secret: fdsf43fd21Sd3r2DF43tgtdfgbRESDSFGsfrfwfsdsgbyghrfg3fdsf
   expiration:
-    token: 150000000000
-    refresh: 2000000000000
+    token: 60000
+    refresh: 300000
 
 logging:
   level:

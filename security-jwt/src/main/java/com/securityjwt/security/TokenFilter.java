@@ -1,7 +1,7 @@
 package com.securityjwt.security;
 
 import com.securityjwt.enums.Role;
-import com.securityjwt.models.TokenAuthentication;
+import com.securityjwt.models.TokenAuth;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -34,9 +34,9 @@ public class TokenFilter extends GenericFilterBean {
             token = bearer.substring(7);
         }
 
-        if (token != null && tokenService.validateAccessToken(token)) {
-            Claims claims = tokenService.getAccessClaims(token);
-            TokenAuthentication tokenAuth = TokenAuthentication.builder()
+        if (token != null && tokenService.validateToken(token)) {
+            Claims claims = tokenService.getClaims(token);
+            TokenAuth tokenAuth = TokenAuth.builder()
                 .username(claims.getSubject())
                 .authenticated(true)
                 .name(claims.get("name", String.class))

@@ -26,7 +26,7 @@ public class ExceptionsHandler {
     }
 
     @ExceptionHandler(RefreshFailedException.class)
-    @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ResponseBody
     public ErrorResponse handleRefreshFailedException(RefreshFailedException ex) {
         return new ErrorResponse(ex.getMessage());

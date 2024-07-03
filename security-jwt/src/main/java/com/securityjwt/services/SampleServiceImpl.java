@@ -3,7 +3,7 @@ package com.securityjwt.services;
 import org.springframework.stereotype.Service;
 
 @Service
-public class ProductServiceImpl implements ProductService {
+public class SampleServiceImpl implements SampleService {
 
     @Override
     public String checkPerformerAccess(){

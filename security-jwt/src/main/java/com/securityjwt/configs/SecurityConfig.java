@@ -27,11 +27,11 @@ public class SecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                .requestMatchers("/users/**").permitAll()
-                .requestMatchers("/shop/perforer-board/**").hasAuthority("PERFORMER")
-                .requestMatchers("/shop/customer-board/**").hasAuthority("CUSTOMER")
-                .requestMatchers("/shop/statistics/**").hasAnyAuthority("PERFORMER", "CUSTOMER")
-                .requestMatchers("/shop/demo/**").hasAuthority("USER")
+                .requestMatchers("/api/users/**").permitAll()
+                .requestMatchers("/api/products/shop/performer-board/**").hasAuthority("PERFORMER")
+                .requestMatchers("/api/products/shop/customer-board/**").hasAuthority("CUSTOMER")
+                .requestMatchers("/api/products/shop/statistics/**").hasAnyAuthority("PERFORMER", "CUSTOMER")
+                .requestMatchers("/api/products/shop/demo/**").hasAuthority("USER")
                 .anyRequest().authenticated())
             .addFilterAfter(tokenFilter, UsernamePasswordAuthenticationFilter.class)
             .build();
