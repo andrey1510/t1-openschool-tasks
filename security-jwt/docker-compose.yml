@@ -1,0 +1,29 @@
+services:
+
+  security-jwt:
+    container_name: security-jwt
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - MAVEN_SKIP_TESTS=true
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/user-db
+      - SPRING_DATASOURCE_USERNAME=user
+      - SPRING_DATASOURCE_PASSWORD=password
+    ports:
+      - 8224:8224
+    depends_on:
+      - user-db
+    restart: unless-stopped
+
+  user-db:
+    container_name: user-db
+    image: postgres:15
+    environment:
+      - POSTGRES_DB=userbase
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+    ports:
+      - 8225:5432
+    restart: unless-stopped
