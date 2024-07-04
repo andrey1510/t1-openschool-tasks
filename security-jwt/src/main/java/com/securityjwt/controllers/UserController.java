@@ -32,13 +32,12 @@ import java.util.Set;
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
-@Schema(description = "Все операции по регистрации и аутентификации пользователя.")
+@Schema(description = "Все операции по регистрации и аутентификации пользователей.")
 public class UserController {
 
     private final UserService userService;
     private final TokenService tokenService;
     private final PasswordEncoder passwordEncoder;
-    private final RefreshTokenRepository tokenRepository;
 
     @PostMapping("/register")
     @Operation(description = "Зарегистрировать пользователя. По умолчанию новому пользователю присваивается роль User, " +
@@ -89,7 +88,7 @@ public class UserController {
         if (passwordEncoder.matches(password, user.getPassword())) {
             final String token = tokenService.generateAccessToken(user);
             final String refreshToken = tokenService.generateRefreshToken(user);
-            return  ResponseEntity.ok(new TokenResponse(token, refreshToken));
+            return ResponseEntity.ok(new TokenResponse(token, refreshToken));
         } else {
             throw new AuthenticationFailedException("Указан неверный пароль.");
         }
@@ -107,8 +106,7 @@ public class UserController {
 
         User user = userService.findByUsername(tokenService.getClaims(refreshToken).getSubject()).orElseThrow();
 
-        String latestRefreshToken = tokenRepository
-            .findLatestRefreshToken(user.getUsername()).orElseThrow().get(0).getTokenValue();
+        String latestRefreshToken = tokenService.findLatestRefreshTokenByUsername(user.getUsername());
 
         if (!latestRefreshToken.isEmpty() && latestRefreshToken.equals(refreshToken)) {
             return ResponseEntity.ok(

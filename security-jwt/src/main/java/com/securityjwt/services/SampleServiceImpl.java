@@ -16,7 +16,7 @@ public class SampleServiceImpl implements SampleService {
     }
 
     @Override
-    public String checkBothAccess(){
+    public String checkPerformerOrCustomerAccess(){
         return "Доступ разрешен.";
     }
 

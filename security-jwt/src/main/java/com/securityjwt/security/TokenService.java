@@ -8,19 +8,18 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.util.Date;
 
-@Slf4j
 @Component
 @RequiredArgsConstructor
 public class TokenService {
 
-    private final RefreshTokenRepository tokenRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     @Value("${jwt.secret}")
     private String jwtSecret;
@@ -50,7 +49,7 @@ public class TokenService {
             .signWith(Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret)))
             .compact();
 
-        tokenRepository.save(RefreshToken.builder()
+        refreshTokenRepository.save(RefreshToken.builder()
             .user(user)
             .tokenValue(token)
             .expirationTime(expirationDate.toInstant())
@@ -74,6 +73,11 @@ public class TokenService {
         return Jwts.parserBuilder()
             .setSigningKey(Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret)))
             .build().parseClaimsJws(token).getBody();
+    }
+
+    @Transactional
+    public String findLatestRefreshTokenByUsername(String username) {
+        return refreshTokenRepository.findLatestRefreshTokenByUsername(username).orElseThrow().get(0).getTokenValue();
     }
 
 }

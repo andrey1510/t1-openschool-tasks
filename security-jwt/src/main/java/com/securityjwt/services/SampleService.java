@@ -5,7 +5,7 @@ public interface SampleService {
 
     String checkCustomerAccess();
 
-    String checkBothAccess();
+    String checkPerformerOrCustomerAccess();
 
     String checkUserAccess();
 }

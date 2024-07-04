@@ -18,6 +18,6 @@ public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long
         "WHERE u.username = :username " +
         "ORDER BY rt.expirationTime DESC " +
         "LIMIT 1")
-    Optional<List<RefreshToken>> findLatestRefreshToken(@Param("username") String username);
+    Optional<List<RefreshToken>> findLatestRefreshTokenByUsername(@Param("username") String username);
 
 }

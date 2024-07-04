@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/products")
 @RequiredArgsConstructor
-@Schema(description = "Все операции с примерами авторизации пользователей.")
+@Schema(description = "Примеры операций с авторизацией пользователей.")
 public class SampleController {
 
     private final SampleService sampleService;
@@ -35,11 +35,12 @@ public class SampleController {
     }
 
     @Operation(
-        description = "К этому методу могут иметь доступ только зарегистрированные пользователи с ролью Performer или Customer.",
+        description = "К этому методу могут иметь доступ только зарегистрированные пользователи " +
+            "с ролью Performer или Customer.",
         security = {@SecurityRequirement(name = "BearerAuth")})
     @GetMapping("/shop/statistics/check-performer-and-customer-access")
-    public ResponseEntity<String> checkBothAccess(){
-        return ResponseEntity.ok(sampleService.checkBothAccess());
+    public ResponseEntity<String> checkPerformerOrCustomerAccess(){
+        return ResponseEntity.ok(sampleService.checkPerformerOrCustomerAccess());
     }
 
     @Operation(
